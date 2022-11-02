@@ -12,6 +12,10 @@ class Database {
   async initialize() {
     return await this.dataSource.initialize();
   }
+
+  async destroy() {
+    return await this.dataSource.destroy();
+  }
 }
 
 const typeOrmDataSource = new DataSource({

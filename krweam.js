@@ -16,7 +16,7 @@ const { globalErrorHandler } = require("./util/globalErrorHandler");
 
 app.use(express.json());
 app.use(cors());
-app.use(morgan("dev"));
+app.use(morgan("tiny"));
 app.use(router);
 app.use(globalErrorHandler);
 
@@ -33,5 +33,6 @@ server.listen(PORT, () => {
     })
     .catch(() => {
       console.log(`typeORM dataSource init failed`);
+      database.destroy();
     });
 });
