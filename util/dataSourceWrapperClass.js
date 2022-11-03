@@ -4,21 +4,12 @@ class Database {
   constructor(dataSource) {
     this.dataSource = dataSource;
   }
-
   async query(sql, params) {
     return await this.dataSource.query(sql, params);
   }
+};
 
-  async initialize() {
-    return await this.dataSource.initialize();
-  }
-
-  async destroy() {
-    return await this.dataSource.destroy();
-  }
-}
-
-const typeOrmDataSource = new DataSource({
+const krweamDataSource = new DataSource({
   type: process.env.TYPEORM_CONNECTION,
   host: process.env.TYPEORM_HOST,
   port: process.env.TYPEORM_PORT,
@@ -27,6 +18,6 @@ const typeOrmDataSource = new DataSource({
   database: process.env.TYPEORM_DATABASE,
 });
 
-const database = new Database(typeOrmDataSource);
+const database = new Database(krweamDataSource);
 
-module.exports = database;
+module.exports = { database, krweamDataSource };
