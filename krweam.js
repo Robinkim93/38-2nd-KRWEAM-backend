@@ -11,7 +11,7 @@ const server = http.createServer(app);
 const PORT = process.env.PORT;
 
 const router = require("./routers");
-const database = require("./util/dataSourceWrapperClass");
+const { krweamDataSource } = require("./util/dataSourceWrapperClass");
 const { globalErrorHandler } = require("./util/globalErrorHandler");
 
 app.use(express.json());
@@ -26,13 +26,12 @@ app.get("/ping", (req, res, next) => {
 
 server.listen(PORT, () => {
   console.log(`open server with ${PORT}`);
-  database
+  krweamDataSource
     .initialize()
     .then(() => {
       console.log(`typeORM dataSource init success`);
     })
-    .catch(() => {
-      console.log(`typeORM dataSource init failed`);
-      database.destroy();
+    .catch((error) => {
+      console.error(`typeORM dataSource init failed`, error);
     });
 });
