@@ -7,7 +7,7 @@ class Database {
   async query(sql, params) {
     return await this.dataSource.query(sql, params);
   }
-};
+}
 
 const krweamDataSource = new DataSource({
   type: process.env.TYPEORM_CONNECTION,
