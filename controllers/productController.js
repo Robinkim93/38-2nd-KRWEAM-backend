@@ -1,24 +1,39 @@
 const productService = require("../services/productService");
 const { catchAsync } = require("../util/globalErrorHandler");
 
-const getNewProducts = catchAsync(async (req, res) => {
-  const { offset, limit } = req.query;
+function isInt(value) {
+     var er = /^-?[0-9]+$/;
+     return er.test(value);
+ };
 
-  if (!offset) {
-    const error = new Error("KEY_ERROR");
-    error.statusCode = 400;
+const getNewProducts = catchAsync(async(req, res) => {
+     const { offset, limit } = req.query;
+     let userId=0;
+     if(req.user) userId = req.user.id;
 
-    throw error;
-  }
-  if (!limit) {
-    const error = new Error("KEY_ERROR");
-    error.statusCode = 400;
+     if(!isInt(offset) || !isInt(limit)) {
+          const error = new Error('KEY_ERROR');
+          error.statusCode = 400;
 
-    throw error;
-  }
+          throw error;
+     }
+     const data = await productService.getNewProducts(+offset, +limit, userId);
+     return await res.status(200).json({ data });
+});
 
-  const data = await productService.getNewProducts(+offset, +limit);
-  return await res.status(200).json({ data });
+const getApplicableProducts = catchAsync(async(req, res) => {
+     const { keyword, brand, category, gender, offset, limit } = req.query;
+     let userId=0;
+     if(req.user) userId = req.user.id;
+
+     if(!isInt(offset) || !isInt(limit)) {
+          const error = new Error('KEY_ERROR');
+          error.statusCode = 400;
+
+          throw error;
+     }
+     const data = await productService.getApplicableProducts(keyword, +brand, +category, +gender, +offset, +limit, userId);
+     return await res.status(200).json({ data });
 });
 
 const getProductInfo = catchAsync(async (req, res, next) => {
@@ -53,6 +68,7 @@ const getBrandProduct = catchAsync(async (req, res, next) => {
 
 module.exports = {
   getNewProducts,
+  getApplicableProducts,
   getProductInfo,
   getProductHistories,
   getBrandProduct,
