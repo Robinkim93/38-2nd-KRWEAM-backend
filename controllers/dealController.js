@@ -2,7 +2,8 @@ const dealService = require("../services/dealService");
 const { catchAsync } = require("../util/globalErrorHandler");
 
 const requestBuy = catchAsync(async (req, res, next) => {
-  const { productId, userId, price, totalPrice, sizeId } = req.body;
+  const { productId, price, totalPrice, sizeId } = req.body;
+  const userId = req.user.id;
 
   if (!productId || !userId || !price || !sizeId || !totalPrice) {
     return res.status(400).json({ message: "KEY_ERROR" });
@@ -20,7 +21,8 @@ const requestBuy = catchAsync(async (req, res, next) => {
 });
 
 const requestSell = catchAsync(async (req, res, next) => {
-  const { productId, userId, price, sizeId, totalPrice } = req.body;
+  const { productId, price, sizeId, totalPrice } = req.body;
+  const userId = req.user.id;
 
   if (!productId || !userId || !price || !sizeId || !totalPrice) {
     return res.status(400).json({ message: "KEY_ERROR" });
@@ -38,7 +40,8 @@ const requestSell = catchAsync(async (req, res, next) => {
 });
 
 const getProductInfo = catchAsync(async (req, res, next) => {
-  const { productId, userId } = req.params;
+  const { productId } = req.params;
+  const userId = req.user.id;
 
   if (!productId || !userId) {
     return res.status(400).json({ message: "KEY_ERROR" });
