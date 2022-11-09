@@ -3,20 +3,20 @@ const { point } = require("./enums");
 
 const createUserWithEmail = async (nickName, phoneNumber, email, password) => {
   const result = await database.query(
-    `
-	  INSERT INTO users (
-				nickname, 
-                    phone_number,
-				email, 
-				password,
-                    point
-		) VALUES (
-				?,
-				?, 
-				?, 
-				?,
-                    ?
-		)`,
+      `
+      INSERT INTO users (
+          nickname, 
+          phone_number,
+          email, 
+          password,
+          point
+      ) VALUES (
+          ?,
+          ?, 
+          ?, 
+          ?,
+          ?
+          )`,
     [nickName, phoneNumber, email, password, point]
   );
   return result.insertId;
@@ -24,13 +24,13 @@ const createUserWithEmail = async (nickName, phoneNumber, email, password) => {
 
 const getUserByEmail = async (email) => {
   const result = await database.query(
-    `
-		SELECT 
-               id,
-               email,
-               password
-		FROM users
-		WHERE email=?`,
+      `
+      SELECT 
+          id,
+          email,
+          password
+      FROM users
+      WHERE email=?`,
     [email]
   );
   return result[0];
@@ -62,9 +62,9 @@ const createUserWithKakao = async (nickName, kakao_id) => {
   const result = await database.query(
     `
           INSERT INTO users (
-                       nickname, 
-                       kakao_id,
-                       point
+                nickname, 
+                kakao_id,
+                point
              ) VALUES (
                        ?,
                        ?,
@@ -78,19 +78,31 @@ const createUserWithKakao = async (nickName, kakao_id) => {
 const getMyPageUserInfo = async (userId) => {
   return await database.query(`
           SELECT
-          u.nickname,
-          u.email,
-          u.point
+            u.nickname,
+            u.email,
+            u.point
           FROM users AS u
           WHERE u.id = ${userId}
      `);
 };
 
-module.exports = {
-  createUserWithEmail,
-  getUserByEmail,
-  getUserById,
-  getUserByKaKaoId,
-  createUserWithKakao,
-  getMyPageUserInfo,
-};
+const editUserInfo = async (userId, email, password) => {
+     const updateUser = await database.query(`
+          UPDATE users SET
+               email=?,
+               password=?
+          WHERE id=?`, [email, password, userId]
+     )
+     console.log(updateUser);
+     return updateUser
+}
+
+module.exports = { 
+    createUserWithEmail,
+    getUserByEmail,
+    getUserById,
+    getUserByKaKaoId,
+    createUserWithKakao,
+    getMyPageUserInfo,
+    editUserInfo
+}
