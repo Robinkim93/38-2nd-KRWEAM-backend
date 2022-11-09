@@ -1,9 +1,10 @@
 const dealController = require("../controllers/dealController");
+const { loginRequired } = require("../util/auth");
 
 const router = require("express").Router();
 
-router.post("/buy", dealController.requestBuy);
-router.post("/sell", dealController.requestSell);
-router.get("/:productId/:userId", dealController.getProductInfo);
+router.post("/buy", loginRequired, dealController.requestBuy);
+router.post("/sell", loginRequired, dealController.requestSell);
+router.get("/:productId", loginRequired, dealController.getProductInfo);
 
 module.exports = { router };
