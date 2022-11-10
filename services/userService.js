@@ -159,13 +159,34 @@ const getMyPageUserInfo = async (userId) => {
   return await userDao.getMyPageUserInfo(userId);
 };
 
-module.exports = {
-  signUp,
-  signIn,
-  getUserById,
-  reqAuthCode,
-  getKakaoToken,
-  getUserInfo,
-  kakaoLogIn,
-  getMyPageUserInfo
-};
+const editUserInfo = async(userId, email, password) => {
+    if(!EMAILREGEX.test(email)) {
+        const error = new Error('INVALID_EMAIL');
+        error.statusCode = 400;
+
+        throw error
+    }
+ 
+    if(!PWREGEX.test(password)) {
+        const error = new Error('INVALID_PASSWORD');
+        error.statusCode = 400;
+
+        throw error
+    }
+
+    const hashedPassword = await hashPassword(password)
+
+    return await userDao.editUserInfo(userId, email, hashedPassword);
+}
+
+module.exports = { 
+    signUp, 
+    signIn,
+    getUserById,
+    reqAuthCode,
+    getKakaoToken,
+    getUserInfo,
+    kakaoLogIn,
+    getMyPageUserInfo,
+    editUserInfo
+}
