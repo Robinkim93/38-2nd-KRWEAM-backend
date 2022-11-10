@@ -156,6 +156,10 @@ const kakaoLogIn = async (userInfo) => {
   return accessToken;
 };
 
+const getMyPageUserInfo = async (userId) => {
+  return await userDao.getMyPageUserInfo(userId);
+};
+
 module.exports = {
   signUp,
   signIn,
@@ -164,4 +168,5 @@ module.exports = {
   getKakaoToken,
   getUserInfo,
   kakaoLogIn,
+  getMyPageUserInfo,
 };
