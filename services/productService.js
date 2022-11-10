@@ -1,7 +1,20 @@
 const productDao = require("../models/productDao");
 
-const getProductInfo = async (productId) => {
-  return await productDao.getProductInfo(productId);
+const getProductInfo = async (productId, userId) => {
+     const data= await productDao.getProductInfo(productId);
+     if(userId!=0){
+          const interestedProducts =await productDao.getInterestedItem(userId); 
+          for(let value of data){
+               value.LikedStatus=false
+               if(interestedProducts){
+                    for(let productId of interestedProducts.productId){
+                         if(value.productId==productId) value.LikedStatus=true
+                    }
+               }
+          }
+
+     }
+     return data;
 };
 
 const getProductHistories = async (productId) => {

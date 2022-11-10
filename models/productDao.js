@@ -79,6 +79,7 @@ const getApplicableProducts = async(result, offset, limit) => {
 const getProductInfo = async (productId) => {
   const data = await database.query(`
        SELECT
+         p.id AS productId,
          p.category_id AS categoryId, 
          b.english_name AS brandEngName,
          p.english_name AS productEngName,  
@@ -87,10 +88,18 @@ const getProductInfo = async (productId) => {
          p.model_number AS modelNumber,
          p.color,
          p.released_price,
+         ii.count AS totalWished,
          (SELECT bp.price FROM buy_prices AS bp WHERE bp.product_id = ${productId} ORDER BY bp.price ASC LIMIT 1) AS buyPrice,
          (SELECT sp.price FROM sell_prices AS sp WHERE sp.product_id = ${productId} ORDER BY sp.price ASC LIMIT 1) AS sellPrice,
          (SELECT dh.price FROM deal_histories AS dh WHERE dh.product_id = ${productId} ORDER BY dh.price ASC LIMIT 1) AS recentlyPrice
-       FROM products AS p
+         FROM products AS p
+         LEFT JOIN(
+          SELECT 
+               product_id,
+               count(id) as count
+          FROM interested_items
+          GROUP BY product_id
+           ) ii ON ii.product_id=p.id
        LEFT JOIN brands AS b ON p.brand_id = b.id
        WHERE p.id = ${productId}
      `);
@@ -157,3 +166,4 @@ module.exports = {
   getProductHistories,
   getBrandProduct,
 };
+ 

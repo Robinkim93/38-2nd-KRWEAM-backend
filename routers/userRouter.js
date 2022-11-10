@@ -9,5 +9,6 @@ router.post("/signin", userController.signIn);
 router.get("/auth/kakao", userController.kakaoAuth);
 router.get("/auth/kakao/callback", userController.kakaoLogIn);
 router.get("/info", loginRequired, userController.getMyPageUserInfo);
+router.patch("/info", loginRequired, userController.editUserInfo);
 
 module.exports = router;
