@@ -1,39 +1,80 @@
 const { database } = require("../util/dataSourceWrapperClass");
 
-const getNewProducts = async (offset, limit) => {
-  const data = await database.query(
-    `
-     SELECT
-          p.id AS productId,
-          b.english_name AS brand,
-          p.english_name AS productEngName,
-          p.korean_name AS productKorName,
-          p.thumbnail AS productImage,
-          s.sizes AS sizes,
-          sp.price AS buyPrice
+const getInterestedItem = async(userId) => {
+     const interestedProducts = await database.query(`
+          SELECT 
+               JSON_ARRAYAGG(product_id) productId
+          FROM interested_items
+          WHERE user_id=?
+          GROUP BY user_id`, [userId]
+     );
+     return interestedProducts[0];
+}; 
+
+const getNewProducts = async(offset, limit) => {
+     const data = await database.query(`
+          SELECT
+               p.id AS productId,
+               b.english_name AS brand,
+               p.english_name AS productEngName,
+               p.korean_name AS productKrName,
+               p.thumbnail AS productImage,
+               s.sizes AS sizes,
+               sp.price AS buyPrice
+               FROM products p
+               LEFT JOIN brands b ON p.brand_id = b.id
+               LEFT JOIN categories c ON c.id=p.category_id
+               LEFT JOIN(
+                    SELECT
+                    category_id,
+                    JSON_ARRAYAGG(size) AS sizes
+                    FROM sizes
+                    GROUP BY category_id
+                    ) s ON s.category_id=c.id
+               LEFT JOIN(
+                    SELECT
+                         product_id,
+                         Min(price) AS price
+                    FROM sell_prices
+                    GROUP BY product_id
+               ) sp ON sp.product_id = p.id
+               ORDER BY p.id DESC
+               LIMIT ?, ?`, [offset, limit]
+     );
+     return data;
+};
+
+const getApplicableProducts = async(result, offset, limit) => {    
+     const data = await database.query(`
+          SELECT 
+               p.id AS id,
+               b.english_name AS brand,
+               p.english_name AS productEngName,
+               p.korean_name AS productKrName,
+               p.thumbnail AS productImage,
+               sp.price AS buyPrice,
+               ii.count AS totalWished
           FROM products p
-          LEFT JOIN brands b ON p.brand_id = b.id
-          LEFT JOIN categories c ON c.id=p.category_id
-          LEFT JOIN(
-               SELECT
-               category_id,
-               JSON_ARRAYAGG(size) AS sizes
-               FROM sizes
-               GROUP BY category_id
-               ) s ON s.category_id=c.id
+          LEFT JOIN brands b ON p.brand_id=b.id
           LEFT JOIN(
                SELECT
                     product_id,
                     Min(price) AS price
                FROM sell_prices
                GROUP BY product_id
-          ) sp ON sp.product_id = p.id
-          ORDER BY p.id DESC
-          LIMIT ?, ?`,
-    [offset, limit]
-  );
-  return data;
-};
+          ) sp ON sp.product_id=p.id
+          LEFT JOIN(
+               SELECT 
+                    product_id,
+                    count(id) as count
+               FROM interested_items
+               GROUP BY product_id
+          ) ii ON ii.product_id=p.id
+          ${result}
+          LIMIT ?,?`,[offset, limit]
+     );
+     return data;
+}
 
 const getProductInfo = async (productId) => {
   const data = await database.query(`
@@ -109,7 +150,9 @@ const getBrandProduct = async (brandName) => {
 };
 
 module.exports = {
+  getInterestedItem,
   getNewProducts,
+  getApplicableProducts,
   getProductInfo,
   getProductHistories,
   getBrandProduct,

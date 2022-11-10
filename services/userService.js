@@ -136,24 +136,23 @@ const getUserInfo = async (token) => {
 };
 
 const kakaoLogIn = async (userInfo) => {
-  const user = await userDao.getUserByKaKaoId(userInfo.id);
-  let userId;
-  console.log(user);
-  if (user.length == 0) {
-    userId = await userDao.createUserWithKakao(
-      userInfo.properties.nickname,
-      userInfo.id
-    );
-  } else {
-    userId = user[0].id;
-  }
+    const user = await userDao.getUserByKaKaoId(userInfo.id);
+    let userId;
+    console.log(user);
+    if (user.length == 0) {
+      userId = await userDao.createUserWithKakao(
+        userInfo.properties.nickname,
+        userInfo.id
+      );
+    } else {
+      userId = user[0].id;
+    }
+    const accessToken = jwt.sign({ id: userId }, process.env.JWT_SECRET_KEY, {
+      algorithm: process.env.ALGORITHM,
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    });
 
-  const accessToken = jwt.sign({ id: userId }, process.env.JWT_SECRET_KEY, {
-    algorithm: process.env.ALGORITHM,
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-
-  return accessToken;
+    return accessToken;
 };
 
 const getMyPageUserInfo = async (userId) => {
@@ -168,5 +167,5 @@ module.exports = {
   getKakaoToken,
   getUserInfo,
   kakaoLogIn,
-  getMyPageUserInfo,
+  getMyPageUserInfo
 };
