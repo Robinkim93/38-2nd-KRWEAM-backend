@@ -38,10 +38,12 @@ const getApplicableProducts = catchAsync(async(req, res) => {
 
 const getProductInfo = catchAsync(async (req, res, next) => {
   const { productId } = req.params;
+  let userId=0;
+  if(req.user) userId = req.user.id;
 
   if (!productId) return res.status(400).json({ message: "KEY_ERROR" });
 
-  const data = await productService.getProductInfo(productId);
+  const data = await productService.getProductInfo(productId, userId);
 
   return await res.status(200).json({ message: data });
 });

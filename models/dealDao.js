@@ -1,6 +1,6 @@
 const { krweamDataSource } = require("../util/dataSourceWrapperClass");
 
-const createBuy = async (productId, userId, price, totalPrice, sizeId) => {
+const createBuy = async (productId, userId, price, sizeId,totalPrice ) => {
   const queryRunner = krweamDataSource.createQueryRunner();
   try {
     await queryRunner.connect();
@@ -30,7 +30,7 @@ const createBuy = async (productId, userId, price, totalPrice, sizeId) => {
     `);
       await queryRunner.commitTransaction();
       await queryRunner.release();
-      return "ADD_SELLPRICE_DATA";
+      return "ADD_BUYPRICE_DATA";
     }
 
     const { sellPriceId, sellProductId, sellUserId, sellPrice } =
@@ -42,6 +42,7 @@ const createBuy = async (productId, userId, price, totalPrice, sizeId) => {
     `,
       [sellUserId, userId, sellProductId, sellPrice, sizeId]
     );
+    
 
     await queryRunner.query(`
     DELETE FROM sell_prices WHERE id = ${sellPriceId}
@@ -107,7 +108,7 @@ const createSell = async (productId, userId, price, sizeId, totalPrice) => {
       `);
       await queryRunner.commitTransaction();
       await queryRunner.release();
-      return "ADD_BUYPRICE_DATA";
+      return "ADD_SELLPRICE_DATA";
     }
 
     const { buyPriceId, buyProductId, buyUserId, buyPrice } = buyPriceData[0];

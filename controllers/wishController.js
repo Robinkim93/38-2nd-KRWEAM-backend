@@ -14,20 +14,20 @@ const createWishList = catchAsync(async (req, res, next) => {
 });
 
 const deleteWishList = catchAsync(async (req, res, next) => {
-  const { productId } = req.body;
+  const { productId } = req.params;
   const userId = req.user.id;
-
+  
   if (!productId || !userId) {
-    return res.status(400).json({ message: "KEY_ERROR" });
+    return await res.status(400).json({ message: "KEY_ERROR" });
   }
 
   const data = await wishService.deleteWishList(productId, userId);
 
-  return await res.status(204);
+  return await res.status(204).json({message : data});
 });
 
 const getWishList = catchAsync(async (req, res, next) => {
-  const { userId } = req.user.id;
+  const userId  = req.user.id;
 
   if (!userId) {
     return res.status(400).json({ message: "KEY_ERROR" });
